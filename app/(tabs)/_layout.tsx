@@ -1,43 +1,88 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+// app/(tabs)/_layout.tsx
+import { Tabs } from "expo-router";
+import { Platform, Dimensions } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "../../constants/Colors";
+import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useEffect, useState } from "react";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+  const [paddingBottom, setPaddingBottom] = useState(10);
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  useEffect(() => {
+    // Add some padding to ensure the tab bar doesn't overlap with the edge of the screen
+    setPaddingBottom(Math.max(10, insets.bottom));
+  }, [insets.bottom]);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
+            position: "absolute",
+            backgroundColor: Colors.card,
+            borderTopColor: Colors.border,
+            height: 60 + paddingBottom,
+            paddingBottom: paddingBottom,
           },
-          default: {},
+          default: {
+            backgroundColor: Colors.card,
+            borderTopColor: Colors.border,
+            height: 60 + paddingBottom,
+            paddingBottom: paddingBottom,
+          },
         }),
-      }}>
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.icon,
+        tabBarLabelStyle: {
+          fontWeight: "500",
+        },
+        // Add tab press animation
+        tabBarItemStyle: {
+          paddingVertical: 5,
+        },
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="index" // maps to app/(tabs)/index.tsx
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Home",
+          tabBarIcon: ({ color, focused }) => (
+            <Animated.View
+              style={{ transform: [{ scale: focused ? 1.1 : 1 }] }}
+            >
+              <Ionicons name="home" size={24} color={color} />
+            </Animated.View>
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="explore" // maps to app/(tabs)/explore.tsx
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Explore",
+          tabBarIcon: ({ color, focused }) => (
+            <Animated.View
+              style={{ transform: [{ scale: focused ? 1.1 : 1 }] }}
+            >
+              <Ionicons name="paper-plane" size={24} color={color} />
+            </Animated.View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile" // maps to app/(tabs)/profile/index.tsx (and sub-routes)
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, focused }) => (
+            <Animated.View
+              style={{ transform: [{ scale: focused ? 1.1 : 1 }] }}
+            >
+              <Ionicons name="balloon-outline" size={24} color={color} />
+            </Animated.View>
+          ),
         }}
       />
     </Tabs>
