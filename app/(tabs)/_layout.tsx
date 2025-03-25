@@ -60,7 +60,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore" // maps to app/(tabs)/explore.tsx
+        name="explore" 
         options={{
           title: "Explore",
           tabBarIcon: ({ color, focused }) => (
@@ -73,7 +73,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile" // maps to app/(tabs)/profile/index.tsx (and sub-routes)
+        name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (

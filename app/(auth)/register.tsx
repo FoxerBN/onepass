@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -5,33 +6,77 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  ImageBackground,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
-import Animated, {
-  FadeIn,
-  FadeInDown,
-  FadeInUp,
-} from "react-native-reanimated";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as SecureStore from "expo-secure-store";
 
 export default function RegisterScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [appNick, setAppNick] = useState("");
+  const [pin, setPin] = useState("");
+  const [pinHint, setPinHint] = useState("");
+  const [decryptionPin, setDecryptionPin] = useState("");
 
-  const handleRegister = () => {
-    global.isAuthenticated = true;
-    router.replace("/(tabs)");
+
+  const validateStep = () => {
+    if (currentStep === 1) {
+      if (!firstName.trim() || !lastName.trim()) {
+        Alert.alert("Error", "Please enter both first and last names.");
+        return false;
+      }
+    } else if (currentStep === 2) {
+      if (!appNick.trim()) {
+        Alert.alert("Error", "Please enter an app nickname.");
+        return false;
+      }
+    } else if (currentStep === 3) {
+      if (pin.length < 4) {
+        Alert.alert("Error", "Please enter a PIN with at least 4 digits.");
+        return false;
+      }
+    }
+    return true;
   };
 
-  const handleLoginPress = () => {
-    router.push("/(auth)/login");
+  const handleNext = async () => {
+    if (validateStep()) {
+      if (currentStep < 3) {
+        setCurrentStep(currentStep + 1);
+      } else {
+        const userData = { firstName, lastName, appNick, pinHint };
+        await SecureStore.setItemAsync("userData", JSON.stringify(userData));
+        await SecureStore.setItemAsync("pin", pin);
+        await SecureStore.setItemAsync("decryptionPin", decryptionPin);
+        global.isAuthenticated = true;
+        router.replace("/(tabs)");
+      }
+    }
+  };
+  
+  
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   return (
-    <View
-      style={[
-        styles.container,
+    <ImageBackground
+      source={require("../../assets/images/register-background.webp")}
+      style={styles.background}
+    >
+      <View
+        style={[
+          styles.container,
         {
           paddingTop: insets.top > 0 ? insets.top : 20,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 20,
@@ -44,44 +89,92 @@ export default function RegisterScreen() {
       >
         <Text style={styles.title}>Create Account</Text>
       </Animated.View>
-
       <Animated.View
         entering={FadeInUp.duration(800).delay(200).springify()}
         style={styles.form}
       >
-        <TextInput
-          style={styles.input}
-          placeholder="Full Name"
-          placeholderTextColor={Colors.icon}
-          autoCapitalize="words"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor={Colors.icon}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor={Colors.icon}
-          secureTextEntry
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm Password"
-          placeholderTextColor={Colors.icon}
-          secureTextEntry
-        />
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLoginPress}>
-          <Text style={styles.linkText}>Already have an account? Login</Text>
-        </TouchableOpacity>
+        {/* Step 1: First and Last Name */}
+        {currentStep === 1 && (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              placeholderTextColor={Colors.icon}
+              autoCapitalize="words"
+              value={firstName}
+              onChangeText={setFirstName}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              placeholderTextColor={Colors.icon}
+              autoCapitalize="words"
+              value={lastName}
+              onChangeText={setLastName}
+            />
+          </>
+        )}
+
+        {/* Step 2: App Nick */}
+        {currentStep === 2 && (
+          <>
+          <TextInput
+            style={styles.input}
+            placeholder="App Nick"
+            placeholderTextColor={Colors.icon}
+            autoCapitalize="none"
+            value={appNick}
+            onChangeText={setAppNick}
+          />
+          <TextInput
+              style={styles.input}
+              placeholder="Decryption pass hint (e.g., Date of Birth)"
+              placeholderTextColor={Colors.icon}
+              autoCapitalize="none"
+              value={pinHint}
+              onChangeText={setPinHint}
+            />
+            </>
+        )}
+
+        {/* Step 3: PIN */}
+        {currentStep === 3 && (
+          <>
+          <TextInput
+            style={styles.input}
+            placeholder="PIN (for login to app)"
+            placeholderTextColor={Colors.icon}
+            secureTextEntry
+            keyboardType="numeric"
+            value={pin}
+            onChangeText={setPin}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="PIN (for decryption)"
+            placeholderTextColor={Colors.icon}
+            secureTextEntry
+            value={decryptionPin}
+            onChangeText={setDecryptionPin}
+          />
+          </>
+        )}
+
+        <View style={styles.buttonRow}>
+          {currentStep > 1 && (
+            <TouchableOpacity style={styles.button} onPress={handleBack}>
+              <Text style={styles.buttonText}>Back</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.button} onPress={handleNext}>
+            <Text style={styles.buttonText}>
+              {currentStep < 3 ? "Next" : "Register"}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
     </View>
+    </ImageBackground>
   );
 }
 
@@ -92,7 +185,10 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: "center",
-    backgroundColor: Colors.background,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  background: {
+    flex: 1,
   },
   headerContainer: {
     marginBottom: 30,
@@ -116,21 +212,22 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.inputBackground,
     color: Colors.text,
   },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
   button: {
     backgroundColor: Colors.buttonPrimary,
     padding: 15,
     borderRadius: 12,
     alignItems: "center",
-    marginTop: 10,
+    flex: 1,
+    marginHorizontal: 5,
   },
   buttonText: {
     color: Colors.buttonText,
     fontSize: 16,
     fontWeight: "600",
-  },
-  linkText: {
-    color: Colors.linkText,
-    textAlign: "center",
-    marginTop: 15,
   },
 });

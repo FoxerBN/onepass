@@ -21,7 +21,7 @@ export const Colors = {
   warning: "#FFCC00",
   inputBackground: "#252525",
   inputBorder: "#333333",
-  buttonPrimary: "#4dabff",
+  buttonPrimary: "grey",
   buttonText: "#FFFFFF",
   linkText: "#4dabff",
 };

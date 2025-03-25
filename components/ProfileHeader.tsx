@@ -7,10 +7,14 @@ import Animated, {
   withSpring,
   withRepeat,
 } from "react-native-reanimated";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import * as SecureStore from "expo-secure-store";
 
 export function ProfileHeader() {
   const rotation = useSharedValue(0);
+  const [data, setData] = useState<string | null>(null);
+  const [pincode, setPincode] = useState<string | null>(null);
+  const [decryptionPin, setDecryptionPin] = useState<string | null>(null);
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
@@ -18,9 +22,17 @@ export function ProfileHeader() {
     };
   });
 
-  // Trigger animation on component mount
-  React.useEffect(() => {
+  useEffect(() => {
     rotation.value = withRepeat(withSpring(360), -1, true);
+    const loadData = async () => {
+      const userData = await SecureStore.getItemAsync("userData");
+      const pin = await SecureStore.getItemAsync("pin");
+      const decPin = await SecureStore.getItemAsync("decryptionPin");
+      setData(userData);
+      setPincode(pin);
+      setDecryptionPin(decPin);
+    };
+    loadData();
   }, []);
 
   return (
@@ -28,8 +40,9 @@ export function ProfileHeader() {
       <Animated.View style={animatedStyles}>
         <Ionicons name="person-circle" size={80} color={Colors.primary} />
       </Animated.View>
-      <Text style={styles.name}>John Doe</Text>
-      <Text style={styles.email}>john.doe@example.com</Text>
+      <Text style={styles.name}>{pincode}</Text>
+      <Text style={styles.email}>{data}</Text>
+      <Text style={styles.email}>{decryptionPin}</Text>
     </View>
   );
 }
