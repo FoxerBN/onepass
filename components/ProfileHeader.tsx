@@ -8,14 +8,12 @@ import Animated, {
   withRepeat,
 } from "react-native-reanimated";
 import React, { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
-
 export function ProfileHeader() {
   const rotation = useSharedValue(0);
   const [data, setData] = useState<string | null>(null);
-  const [pincode, setPincode] = useState<string | null>(null);
-  const [decryptionPin, setDecryptionPin] = useState<string | null>(null);
-
+  const [token, setToken] = useState<string | null>(null);
   const animatedStyles = useAnimatedStyle(() => {
     return {
       transform: [{ rotateY: `${rotation.value}deg` }],
@@ -25,12 +23,10 @@ export function ProfileHeader() {
   useEffect(() => {
     rotation.value = withRepeat(withSpring(360), -1, true);
     const loadData = async () => {
-      const userData = await SecureStore.getItemAsync("userData");
-      const pin = await SecureStore.getItemAsync("pin");
-      const decPin = await SecureStore.getItemAsync("decryptionPin");
+      const userData = await AsyncStorage.getItem("userData");
+      const token = await SecureStore.getItemAsync("authToken");
       setData(userData);
-      setPincode(pin);
-      setDecryptionPin(decPin);
+      setToken(token);
     };
     loadData();
   }, []);
@@ -40,9 +36,9 @@ export function ProfileHeader() {
       <Animated.View style={animatedStyles}>
         <Ionicons name="person-circle" size={80} color={Colors.primary} />
       </Animated.View>
-      <Text style={styles.name}>{pincode}</Text>
+
       <Text style={styles.email}>{data}</Text>
-      <Text style={styles.email}>{decryptionPin}</Text>
+      <Text style={styles.email}>{token}</Text>
     </View>
   );
 }

@@ -14,7 +14,7 @@ import { Colors } from "../../constants/Colors";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function RegisterScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -52,11 +52,10 @@ export default function RegisterScreen() {
       if (currentStep < 3) {
         setCurrentStep(currentStep + 1);
       } else {
-        const userData = { firstName, lastName, appNick, pinHint };
-        await SecureStore.setItemAsync("userData", JSON.stringify(userData));
+        const userData = { firstName, lastName, appNick, pinHint,passwords: [] };
+        await AsyncStorage.setItem("userData", JSON.stringify(userData));
         await SecureStore.setItemAsync("pin", pin);
         await SecureStore.setItemAsync("decryptionPin", decryptionPin);
-        global.isAuthenticated = true;
         router.replace("/(tabs)");
       }
     }

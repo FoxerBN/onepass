@@ -14,24 +14,22 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
 import * as LocalAuthentication from "expo-local-authentication";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [pin, setPin] = useState("");
   const [showPinInput, setShowPinInput] = useState(false);
 
-  // On mount, check for user data and try biometric authentication
   useEffect(() => {
     const checkUserAndAuthenticate = async () => {
-      const userData = await SecureStore.getItemAsync("userData");
+      const userData = await AsyncStorage.getItem("userData");
       if (!userData) {
         router.replace("/(auth)/register");
         return;
       }
 
-      const canUseBiometrics =
-        SecureStore.canUseBiometricAuthentication();
+      const canUseBiometrics = SecureStore.canUseBiometricAuthentication();
       if (canUseBiometrics) {
         const result = await LocalAuthentication.authenticateAsync({
           promptMessage: "Authenticate with Fingerprint",
@@ -39,7 +37,7 @@ export default function LoginScreen() {
         });
 
         if (result.success) {
-          global.isAuthenticated = true;
+          SecureStore.setItemAsync("authToken", "true");
           router.replace("/(tabs)");
         } else {
           setShowPinInput(true);
@@ -66,7 +64,10 @@ export default function LoginScreen() {
       return;
     }
     if (pin === storedPin) {
-      global.isAuthenticated = true;
+      // Generate a token (you can use a more secure method in production)
+      const token =
+        Math.random().toString(36).substring(2) + Date.now().toString(36);
+      await SecureStore.setItemAsync("authToken", token);
       router.replace("/(tabs)");
     } else {
       Alert.alert("Login Failed", "Incorrect PIN.");
@@ -74,7 +75,9 @@ export default function LoginScreen() {
   };
 
   const handleRemoveData = async () => {
-    await SecureStore.deleteItemAsync("userData");
+    await AsyncStorage.clear();
+    await SecureStore.deleteItemAsync("pin");
+    await SecureStore.deleteItemAsync("authToken");
     Alert.alert("Data Removed", "User data has been removed from SecureStore.");
   };
 
