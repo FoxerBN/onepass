@@ -1,108 +1,26 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Alert,
-} from "react-native";
-import { useRouter } from "expo-router";
-import { Colors } from "../../constants/Colors";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Dimensions } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import * as SecureStore from "expo-secure-store";
-import * as LocalAuthentication from "expo-local-authentication";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRemoveData } from "../../hooks/useRemoveData";
+import { Colors } from "../../constants/Colors";
+import { useLogin } from "../../hooks/useLogin";
+
 export default function LoginScreen() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { showPinInput, loading, loginWithPin } = useLogin();
   const [pin, setPin] = useState("");
-  const [showPinInput, setShowPinInput] = useState(false);
-  const { removeData } = useRemoveData();
-  useEffect(() => {
-    const checkUserAndAuthenticate = async () => {
-      const userData = await AsyncStorage.getItem("userData");
-      if (!userData) {
-        router.replace("/(auth)/register");
-        return;
-      }
 
-      const canUseBiometrics =
-        await SecureStore.canUseBiometricAuthentication();
-      if (canUseBiometrics) {
-        const result = await LocalAuthentication.authenticateAsync({
-          promptMessage: "Authenticate with Fingerprint",
-          fallbackLabel: "Enter PIN",
-        });
-
-        if (result.success) {
-          const token =
-            Math.random().toString(36).substring(2) + Date.now().toString(36);  
-          SecureStore.setItemAsync("authToken", token);
-          router.replace("/(tabs)");
-        } else {
-          setShowPinInput(true);
-        }
-      } else {
-        setShowPinInput(true);
-      }
-    };
-
-    checkUserAndAuthenticate();
-  }, []);
-
-  const handleLogin = async () => {
-    const storedData = await AsyncStorage.getItem("userData");
-    if (!storedData) {
-      Alert.alert("No user found", "Please register an account first.");
-      router.replace("/(auth)/register");
-      return;
-    }
-    const storedPin = await SecureStore.getItemAsync("pin");
-    if (!storedPin) {
-      Alert.alert("Error", "PIN not found. Please register again.");
-      router.replace("/(auth)/register");
-      return;
-    }
-    if (pin === storedPin) {
-      const token =
-        Math.random().toString(36).substring(2) + Date.now().toString(36);
-      await SecureStore.setItemAsync("authToken", token);
-      router.replace("/(tabs)");
-    } else {
-      Alert.alert("Login Failed", "Incorrect PIN.");
-    }
-  };
-
-
-  const handleRegisterPress = () => {
-    router.push("/(auth)/register");
+  const handleLoginPress = () => {
+    loginWithPin(pin);
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top > 0 ? insets.top : 20,
-          paddingBottom: insets.bottom > 0 ? insets.bottom : 20,
-        },
-      ]}
-    >
-      <Animated.View
-        entering={FadeInDown.duration(800).springify()}
-        style={styles.headerContainer}
-      >
+    <View style={[styles.container, { paddingTop: insets.top || 20, paddingBottom: insets.bottom || 20 }]}>
+      <Animated.View entering={FadeInDown.duration(800).springify()} style={styles.headerContainer}>
         <Text style={styles.title}>Welcome Back</Text>
       </Animated.View>
 
-      <Animated.View
-        entering={FadeInUp.duration(800).delay(200).springify()}
-        style={styles.form}
-      >
+      <Animated.View entering={FadeInUp.duration(800).delay(200).springify()} style={styles.form}>
         {showPinInput && (
           <>
             <TextInput
@@ -113,17 +31,12 @@ export default function LoginScreen() {
               value={pin}
               onChangeText={setPin}
             />
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
               <Text style={styles.buttonText}>Login with PIN</Text>
             </TouchableOpacity>
           </>
         )}
-        <TouchableOpacity onPress={handleRegisterPress}>
-          <Text style={styles.linkText}>Don't have an account? Register</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={removeData}>
-          <Text style={styles.linkText}>Remove Data (Test)</Text>
-        </TouchableOpacity>
+        {/* Additional options like register can be added here */}
       </Animated.View>
     </View>
   );
@@ -171,16 +84,5 @@ const styles = StyleSheet.create({
     color: Colors.buttonText,
     fontSize: 16,
     fontWeight: "600",
-  },
-  linkText: {
-    color: Colors.linkText,
-    textAlign: "center",
-    marginTop: 15,
-  },
-  orText: {
-    textAlign: "center",
-    color: Colors.text,
-    fontSize: 16,
-    marginVertical: 10,
   },
 });

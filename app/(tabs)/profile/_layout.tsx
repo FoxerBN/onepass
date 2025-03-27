@@ -1,4 +1,3 @@
-// app/(tabs)/profile/_layout.tsx
 import { Stack } from "expo-router";
 import { Colors } from "../../../constants/Colors";
 

@@ -1,6 +1,7 @@
 // app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
-import { Platform, Dimensions } from "react-native";
+import { Platform } from "react-native";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import Animated from "react-native-reanimated";
@@ -42,14 +43,13 @@ export default function TabsLayout() {
           tabBarLabelStyle: {
             fontWeight: "500",
           },
-          // Add tab press animation
           tabBarItemStyle: {
             paddingVertical: 5,
           },
         }}
       >
         <Tabs.Screen
-          name="index" // maps to app/(tabs)/index.tsx
+          name="index"
           options={{
             title: "Home",
             tabBarIcon: ({ color, focused }) => (
@@ -62,14 +62,14 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="explore"
+          name="passwords"
           options={{
-            title: "Explore",
+            title: "Passwords",
             tabBarIcon: ({ color, focused }) => (
               <Animated.View
                 style={{ transform: [{ scale: focused ? 1.1 : 1 }] }}
               >
-                <Ionicons name="paper-plane" size={24} color={color} />
+                <MaterialIcons name="password" size={24} color={color} />
               </Animated.View>
             ),
           }}
@@ -82,7 +82,7 @@ export default function TabsLayout() {
               <Animated.View
                 style={{ transform: [{ scale: focused ? 1.1 : 1 }] }}
               >
-                <Ionicons name="balloon-outline" size={24} color={color} />
+                <MaterialIcons name="account-circle" size={24} color={color} />
               </Animated.View>
             ),
           }}
