@@ -13,7 +13,7 @@ import * as SecureStore from "expo-secure-store";
 export function ProfileHeader() {
   const rotation = useSharedValue(0);
   const [data, setData] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+
   const animatedStyles = useAnimatedStyle(() => {
     return {
       transform: [{ rotateY: `${rotation.value}deg` }],
@@ -24,9 +24,7 @@ export function ProfileHeader() {
     rotation.value = withRepeat(withSpring(360), -1, true);
     const loadData = async () => {
       const userData = await AsyncStorage.getItem("userData");
-      const token = await SecureStore.getItemAsync("authToken");
       setData(userData);
-      setToken(token);
     };
     loadData();
   }, []);
@@ -38,7 +36,6 @@ export function ProfileHeader() {
       </Animated.View>
 
       <Text style={styles.email}>{data}</Text>
-      <Text style={styles.email}>{token}</Text>
     </View>
   );
 }
