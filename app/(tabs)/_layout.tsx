@@ -1,4 +1,3 @@
-// app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
 import { Platform } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -14,7 +13,6 @@ export default function TabsLayout() {
   const [paddingBottom, setPaddingBottom] = useState(10);
 
   useEffect(() => {
-    // Add some padding to ensure the tab bar doesn't overlap with the edge of the screen
     setPaddingBottom(Math.max(10, insets.bottom));
   }, [insets.bottom]);
 

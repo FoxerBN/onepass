@@ -55,7 +55,7 @@ export default function ProfileScreen() {
 
       {isDrawerOpen && (
         <Animated.View
-          entering={SlideInLeft.duration(300).springify()}
+          entering={SlideInLeft.duration(200).springify()}
           style={[styles.drawer, { top: 60 + insets.top }]}
         >
           <ScrollView>
@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 16,
     color: Colors.text,
+    fontFamily: "SpaceMono",
   },
   profileSection: {
     alignItems: "center",
@@ -119,6 +120,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 8,
     color: Colors.text,
+    fontFamily: "SpaceMono",
   },
   email: {
     fontSize: 16,
@@ -150,5 +152,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 16,
     color: Colors.text,
+    fontFamily: "SpaceMono"
   },
 });

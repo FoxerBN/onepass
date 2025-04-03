@@ -1,24 +1,13 @@
 import { StyleSheet, Platform, View, Text } from "react-native";
 import { Colors } from "../../constants/Colors";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabTwoScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: insets.top > 0 ? insets.top : 20 },
-      ]}
-    >
-      <Animated.View
-        entering={FadeInDown.duration(800).springify()}
-        style={styles.card}
-      >
-        <Text style={styles.text}>prva stranka</Text>
-      </Animated.View>
+    <View style={[styles.container,{ paddingTop: insets.top > 0 ? insets.top : 20 },]}>
+      <Text style={styles.text}>ahoj</Text>
     </View>
   );
 }
@@ -53,6 +42,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   text: {
+    fontFamily: "SpaceMono",
     color: Colors.text,
     fontSize: 18,
     fontWeight: "600",

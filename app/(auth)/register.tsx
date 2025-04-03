@@ -87,7 +87,6 @@ export default function RegisterScreen() {
       );
       return;
     }
-    // Launch the image library
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: "images",
       allowsEditing: true,
@@ -249,12 +248,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: Colors.text,
     textAlign: "center",
+    fontFamily: "SpaceMono",
   },
   form: {
     gap: 15,
     width: width - 40,
   },
   input: {
+    fontFamily: "SpaceMono",
     borderWidth: 1,
     borderColor: Colors.inputBorder,
     padding: 15,
@@ -271,6 +272,7 @@ const styles = StyleSheet.create({
   },
   imagePickerText: {
     color: Colors.buttonText,
+    fontFamily: "SpaceMono",
     fontSize: 16,
     fontWeight: "600",
   },

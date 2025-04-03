@@ -9,7 +9,6 @@ import { Colors } from "../constants/Colors";
 import "react-native-reanimated";
 import * as NavigationBar from "expo-navigation-bar";
 import { Platform } from "react-native";
-import { ProtectedRoute } from "../components/ProtectedRoute";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,14 +17,13 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  // Hide navigation bar on Android
   useEffect(() => {
     if (Platform.OS === "android") {
       NavigationBar.setVisibilityAsync("hidden");
       NavigationBar.setBackgroundColorAsync(Colors.background);
     }
   }, []);
-
+  
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();

@@ -2,11 +2,12 @@ import { StyleSheet, Platform, View, Text } from "react-native";
 import { Colors } from "../../constants/Colors";
 import Animated, { SlideInRight } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 export default function TabTwoScreen() {
   const insets = useSafeAreaInsets();
 
   return (
+    <ProtectedRoute>
     <View
       style={[
         styles.container,
@@ -20,6 +21,7 @@ export default function TabTwoScreen() {
         <Text style={styles.text}>druha stranka</Text>
       </Animated.View>
     </View>
+    </ProtectedRoute>
   );
 }
 
@@ -56,5 +58,6 @@ const styles = StyleSheet.create({
     color: Colors.text,
     fontSize: 18,
     fontWeight: "600",
+    fontFamily: "SpaceMono",
   },
 });

@@ -10,17 +10,25 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isAvailable = await SecureStore.getItemAsync("authToken")
-      if (!isAvailable) {
+      const token = await SecureStore.getItemAsync("authToken");
+      const expiry = await SecureStore.getItemAsync("tokenExpiry");
+
+      if (!token || !expiry) {
+        await SecureStore.deleteItemAsync("authToken");
+        await SecureStore.deleteItemAsync("tokenExpiry");
         router.replace("/(auth)/login");
         return;
       }
-      const token = await SecureStore.getItemAsync("authToken");
-      if (!token) {
+
+      const now = Date.now();
+      if (now > parseInt(expiry)) {
+        await SecureStore.deleteItemAsync("authToken");
+        await SecureStore.deleteItemAsync("tokenExpiry");
         router.replace("/(auth)/login");
-      } else {
-        setLoading(false);
+        return;
       }
+
+      setLoading(false);
     };
 
     checkAuth();

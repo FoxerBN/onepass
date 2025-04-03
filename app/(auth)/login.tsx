@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Dimensions } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "../../constants/Colors";
@@ -13,6 +13,7 @@ export default function LoginScreen() {
   const handleLoginPress = () => {
     loginWithPin(pin);
   };
+  {loading && "Loading..."}
 
   return (
     <View style={[styles.container, { paddingTop: insets.top || 20, paddingBottom: insets.bottom || 20 }]}>
@@ -36,7 +37,6 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </>
         )}
-        {/* Additional options like register can be added here */}
       </Animated.View>
     </View>
   );
@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    fontFamily: "SpaceMono",
     justifyContent: "center",
     backgroundColor: Colors.background,
   },
@@ -55,6 +56,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   title: {
+    fontFamily: "SpaceMono",
     fontSize: 28,
     fontWeight: "bold",
     color: Colors.text,
@@ -65,6 +67,7 @@ const styles = StyleSheet.create({
     width: width - 40,
   },
   input: {
+    fontFamily: "SpaceMono",
     borderWidth: 1,
     borderColor: Colors.inputBorder,
     padding: 15,
@@ -81,6 +84,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonText: {
+    fontFamily: "SpaceMono",
     color: Colors.buttonText,
     fontSize: 16,
     fontWeight: "600",

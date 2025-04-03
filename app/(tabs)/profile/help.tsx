@@ -18,5 +18,6 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Colors.text,
+    fontFamily: "SpaceMono",
   },
 });

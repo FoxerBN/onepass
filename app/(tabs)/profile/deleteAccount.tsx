@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.buttonText,
+    fontFamily: "SpaceMono",
   },
   button: {
     backgroundColor: Colors.buttonPrimary,

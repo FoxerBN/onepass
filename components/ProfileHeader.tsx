@@ -79,11 +79,12 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "SpaceMono",
     color: Colors.text,
   },
   appNick: {
     fontSize: 16,
     color: Colors.icon,
+    fontFamily: "SpaceMono",
   },
 });
