@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-
+import { useRouter } from "expo-router";
 // Types for user data
 type UserData = {
   appNick: string;
@@ -12,6 +12,7 @@ type UserData = {
 };
 
 export function useProfileSettings() {
+  const router = useRouter();
   // ---------------------------------
   // 1. Consolidated Input State
   // ---------------------------------
@@ -171,18 +172,30 @@ export function useProfileSettings() {
       setFeedback("encPin", "New encryption PIN entries do not match.");
       return;
     }
-
-    // If you want to show a modal here, do it from the UI side
-    // Or finalize it directly:
+    console.log('first step');
+    
     finalizeEncPinChange();
   }
 
   async function finalizeEncPinChange() {
+    console.log("Inside finalizeEncPinChange");
     try {
+      // Add more detailed logging
+      console.log("Before saving to SecureStore");
       await SecureStore.setItemAsync("decryptionPin", input.newEncPin);
+      console.log("After saving to SecureStore");
       setStoredEncPin(input.newEncPin);
+      console.log("After updating state");
       setFeedback("encPin", "Encryption PIN updated successfully.");
+      console.log("After setting feedback");
 
+      // Try a different navigation approach
+      setTimeout(() => {
+        console.log("Attempting navigation to edit hint modal");
+        router.push("/(modal)/editHintModal");
+      }, 100);
+
+      console.log('Before clearing input fields');
       // Clear the input fields
       setInput((prev) => ({
         ...prev,
@@ -190,8 +203,10 @@ export function useProfileSettings() {
         newEncPin: "",
         confirmEncPin: "",
       }));
+
+      console.log('After clearing input fields');
     } catch (error) {
-      console.error("Error updating encryption PIN", error);
+      console.error("Error in finalizeEncPinChange:", error);
       setFeedback("encPin", "Failed to update encryption PIN.");
     }
   }
