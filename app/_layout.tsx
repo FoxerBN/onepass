@@ -9,7 +9,7 @@ import { Colors } from "../constants/Colors";
 import "react-native-reanimated";
 import * as NavigationBar from "expo-navigation-bar";
 import { Platform } from "react-native";
-
+import Toast from "react-native-toast-message";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -54,6 +54,7 @@ export default function RootLayout() {
           }}
         />
       </Stack>
+      <Toast />
       <StatusBar style="light" hidden={true} />
     </ThemeProvider>
   );

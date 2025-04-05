@@ -12,7 +12,6 @@ export default function ProfileSettingsScreen() {
   const {
     input,
     setInput,
-    messages,
     handleNicknameConfirm,
     handlePinConfirm,
     handleEncPinConfirm,
@@ -26,9 +25,11 @@ export default function ProfileSettingsScreen() {
 
       <ChangeNicknameSection
         nicknameInput={input.nickname}
-        setNicknameInput={(val) => setInput((prev) => ({ ...prev, nickname: val }))}
-        nicknameMessage={messages.nickname}
+        setNicknameInput={(val) =>
+          setInput((prev) => ({ ...prev, nickname: val }))
+        }
         onConfirmNickname={handleNicknameConfirm}
+        nicknameMessage={""}
       />
 
       <ChangePinSection
@@ -37,28 +38,36 @@ export default function ProfileSettingsScreen() {
         newPinInput={input.newPin}
         setNewPinInput={(val) => setInput((prev) => ({ ...prev, newPin: val }))}
         confirmNewPinInput={input.confirmPin}
-        setConfirmNewPinInput={(val) => setInput((prev) => ({ ...prev, confirmPin: val }))}
-        pinMessage={messages.pin}
+        setConfirmNewPinInput={(val) =>
+          setInput((prev) => ({ ...prev, confirmPin: val }))
+        }
         onConfirmPin={handlePinConfirm}
+        pinMessage={""}
       />
 
       <ChangeEncryptionPinSection
         oldEncPinInput={input.oldEncPin}
-        setOldEncPinInput={(val) => setInput((prev) => ({ ...prev, oldEncPin: val }))}
+        setOldEncPinInput={(val) =>
+          setInput((prev) => ({ ...prev, oldEncPin: val }))
+        }
         newEncPinInput={input.newEncPin}
-        setNewEncPinInput={(val) => setInput((prev) => ({ ...prev, newEncPin: val }))}
+        setNewEncPinInput={(val) =>
+          setInput((prev) => ({ ...prev, newEncPin: val }))
+        }
         confirmNewEncPinInput={input.confirmEncPin}
-        setConfirmNewEncPinInput={(val) => setInput((prev) => ({ ...prev, confirmEncPin: val }))}
-        encPinMessage={messages.encPin}
+        setConfirmNewEncPinInput={(val) =>
+          setInput((prev) => ({ ...prev, confirmEncPin: val }))
+        }
         onConfirmEncPin={handleEncPinConfirm}
+        encPinMessage={""}
       />
 
       <ChangeProfilePhotoSection
         photo={input.photo}
         setPhoto={(val) => setInput((prev) => ({ ...prev, photo: val }))}
-        photoMessage={messages.photo}
         onConfirmPhoto={handlePhotoConfirm}
         onPickImage={handlePickImage}
+        photoMessage={""}
       />
     </ScrollView>
   );

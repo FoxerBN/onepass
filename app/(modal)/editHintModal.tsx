@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "reac
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "../../constants/Colors";
-
+import Toast from "react-native-toast-message";
 export default function EditHintModal() {
   const router = useRouter();
   const [pinHint, setPinHint] = useState("");
@@ -27,8 +27,12 @@ export default function EditHintModal() {
         parsedData.pinHint = pinHint;
         await AsyncStorage.setItem("userData", JSON.stringify(parsedData));
       }
-      Alert.alert("Success", "Hint updated!");
-      router.back(); // close the modal
+      Toast.show({
+        type: "success",
+        text1: "Hint updated!",
+        text2: "Your PIN hint was saved successfully 👌",
+      });
+      router.back();
     } catch (error) {
       console.error("Error updating hint", error);
       Alert.alert("Error", "Failed to update hint.");

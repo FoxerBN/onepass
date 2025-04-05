@@ -4,6 +4,7 @@ import * as SecureStore from "expo-secure-store";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { router } from "expo-router";
+import Toast from "react-native-toast-message"; // 🧨 toast import
 
 // Types for user data
 type UserData = {
@@ -28,18 +29,7 @@ export function useProfileSettings() {
   });
 
   // ---------------------------------
-  // 2. Consolidated Messages State
-  //    for inline feedback
-  // ---------------------------------
-  const [messages, setMessages] = useState({
-    nickname: "",
-    pin: "",
-    encPin: "",
-    photo: "",
-  });
-
-  // ---------------------------------
-  // 3. Loaded Data
+  // 2. Loaded Data
   // ---------------------------------
   const [userData, setUserData] = useState<UserData>({
     appNick: "",
@@ -49,7 +39,24 @@ export function useProfileSettings() {
   const [storedEncPin, setStoredEncPin] = useState<string | null>(null);
 
   // ---------------------------------
-  // 4. Effect: Load from Storage
+  // Toast Helper
+  // ---------------------------------
+  function showToast(
+    type: "success" | "error",
+    title: string,
+    message?: string
+  ) {
+    Toast.show({
+      type,
+      text1: title,
+      text2: message,
+      position: "top",
+      visibilityTime: 3000,
+    });
+  }
+
+  // ---------------------------------
+  // Load from Storage
   // ---------------------------------
   useEffect(() => {
     const loadData = async () => {
@@ -58,7 +65,6 @@ export function useProfileSettings() {
         if (storedUserData) {
           const data = JSON.parse(storedUserData) as UserData;
           setUserData(data);
-          // Initialize inputs
           setInput((prev) => ({
             ...prev,
             nickname: data.appNick,
@@ -78,25 +84,11 @@ export function useProfileSettings() {
   }, []);
 
   // ---------------------------------
-  // 5. Helper: Set feedback message
-  //    with an auto-clear after 3s
-  // ---------------------------------
-  function setFeedback(
-    section: "nickname" | "pin" | "encPin" | "photo",
-    text: string
-  ) {
-    setMessages((prev) => ({ ...prev, [section]: text }));
-    setTimeout(() => {
-      setMessages((prev) => ({ ...prev, [section]: "" }));
-    }, 3000);
-  }
-
-  // ---------------------------------
-  // 6. Handlers: Nickname
+  // Nickname Handler
   // ---------------------------------
   async function handleNicknameConfirm() {
     if (!input.nickname.trim()) {
-      setFeedback("nickname", "Nickname cannot be empty.");
+      showToast("error", "Nickname cannot be empty.");
       return;
     }
     try {
@@ -106,40 +98,38 @@ export function useProfileSettings() {
         data.appNick = input.nickname;
         await AsyncStorage.setItem("userData", JSON.stringify(data));
         setUserData(data);
-        setFeedback("nickname", "Nickname updated successfully.");
+        showToast("success", "Nickname updated!");
       }
     } catch (error) {
       console.error("Error updating nickname", error);
-      setFeedback("nickname", "Failed to update nickname.");
+      showToast("error", "Failed to update nickname.");
     }
   }
 
   // ---------------------------------
-  // 7. Handlers: App PIN
+  // App PIN Handler
   // ---------------------------------
   async function handlePinConfirm() {
     if (!storedPin) {
-      setFeedback("pin", "Stored PIN not found.");
+      showToast("error", "Stored PIN not found.");
       return;
     }
     if (input.oldPin !== storedPin) {
-      setFeedback("pin", "Old PIN is incorrect.");
+      showToast("error", "Old PIN is incorrect.");
       return;
     }
     if (input.newPin.length < 4) {
-      setFeedback("pin", "New PIN must be at least 4 digits.");
+      showToast("error", "New PIN must be at least 4 digits.");
       return;
     }
     if (input.newPin !== input.confirmPin) {
-      setFeedback("pin", "New PIN entries do not match.");
+      showToast("error", "New PIN entries do not match.");
       return;
     }
     try {
       await SecureStore.setItemAsync("pin", input.newPin);
       setStoredPin(input.newPin);
-      setFeedback("pin", "PIN updated successfully.");
-
-      // Clear the input fields
+      showToast("success", "PIN updated!");
       setInput((prev) => ({
         ...prev,
         oldPin: "",
@@ -148,44 +138,42 @@ export function useProfileSettings() {
       }));
     } catch (error) {
       console.error("Error updating PIN", error);
-      setFeedback("pin", "Failed to update PIN.");
+      showToast("error", "Failed to update PIN.");
     }
   }
 
   // ---------------------------------
-  // 8. Handlers: Encryption PIN
+  // Encryption PIN Handler
   // ---------------------------------
   async function handleEncPinConfirm() {
     if (!storedEncPin) {
-      setFeedback("encPin", "Stored encryption PIN not found.");
+      showToast("error", "Stored encryption PIN not found.");
       return;
     }
     if (input.oldEncPin !== storedEncPin) {
-      setFeedback("encPin", "Old encryption PIN is incorrect.");
+      showToast("error", "Old encryption PIN is incorrect.");
       return;
     }
     if (input.newEncPin.length < 4) {
-      setFeedback("encPin", "New encryption PIN must be at least 4 digits.");
+      showToast("error", "New encryption PIN must be at least 4 digits.");
       return;
     }
     if (input.newEncPin !== input.confirmEncPin) {
-      setFeedback("encPin", "New encryption PIN entries do not match.");
+      showToast("error", "New encryption PIN entries do not match.");
       return;
     }
     finalizeEncPinChange();
   }
 
   async function finalizeEncPinChange() {
-
     try {
       await SecureStore.setItemAsync("decryptionPin", input.newEncPin);
       setStoredEncPin(input.newEncPin);
-      setFeedback("encPin", "Encryption PIN updated successfully.");
- 
+      showToast("success", "Encryption PIN updated");
+
       setTimeout(() => {
-        console.log("Attempting navigation to edit hint modal");
         router.push("/(modal)/editHintModal");
-      }, 100);
+      }, 300);
 
       setInput((prev) => ({
         ...prev,
@@ -194,18 +182,18 @@ export function useProfileSettings() {
         confirmEncPin: "",
       }));
     } catch (error) {
-      console.error("Error in finalizeEncPinChange:", error);
-      setFeedback("encPin", "Failed to update encryption PIN.");
+      console.error("Error updating encryption PIN", error);
+      showToast("error", "Failed to update encryption PIN.");
     }
   }
 
   // ---------------------------------
-  // 9. Handlers: Profile Photo
+  // Pick Profile Photo
   // ---------------------------------
   async function handlePickImage() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      setFeedback("photo", "Permission to access media library is required.");
+      showToast("error", "Permission to access media library is required.");
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -221,15 +209,17 @@ export function useProfileSettings() {
           from: result.assets[0].uri,
           to: newPath,
         });
-        // Update local input
         setInput((prev) => ({ ...prev, photo: newPath }));
       } catch (error) {
         console.error("Error saving photo", error);
-        setFeedback("photo", "Failed to save photo.");
+        showToast("error", "Failed to save photo.");
       }
     }
   }
 
+  // ---------------------------------
+  // Save Profile Photo
+  // ---------------------------------
   async function handlePhotoConfirm() {
     if (!input.photo) return;
     try {
@@ -239,39 +229,27 @@ export function useProfileSettings() {
         data.photo = input.photo;
         await AsyncStorage.setItem("userData", JSON.stringify(data));
         setUserData(data);
-        setFeedback("photo", "Profile photo updated successfully.");
+        showToast("success", "Profile photo updated");
       }
     } catch (error) {
       console.error("Error updating photo", error);
-      setFeedback("photo", "Failed to update profile photo.");
+      showToast("error", "Failed to update profile photo.");
     }
   }
 
   // ---------------------------------
-  // 10. Return All State + Methods
+  // Return All State + Methods
   // ---------------------------------
   return {
-    // States
     input,
     setInput,
-    messages,
     userData,
-
-    // PIN storage references
     storedPin,
     storedEncPin,
-
-    // Nickname
     handleNicknameConfirm,
-
-    // App PIN
     handlePinConfirm,
-
-    // Enc PIN
     handleEncPinConfirm,
-    finalizeEncPinChange, // optional if using a modal confirm
-
-    // Photo
+    finalizeEncPinChange,
     handlePickImage,
     handlePhotoConfirm,
   };
