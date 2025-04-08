@@ -196,12 +196,14 @@ export function useProfileSettings() {
       showToast("error", "Permission to access media library is required.");
       return;
     }
+  
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
     });
+  
     if (!result.canceled) {
       try {
         const newPath = FileSystem.documentDirectory + "profilePhoto.jpg";
@@ -209,13 +211,20 @@ export function useProfileSettings() {
           from: result.assets[0].uri,
           to: newPath,
         });
+  
+        // Update local state right away so the UI shows the new photo
         setInput((prev) => ({ ...prev, photo: newPath }));
+  
+        // Optional: also update userData if you want immediate sync
+        setUserData((prev) => ({ ...prev, photo: newPath }));
+  
       } catch (error) {
         console.error("Error saving photo", error);
         showToast("error", "Failed to save photo.");
       }
     }
   }
+  
 
   // ---------------------------------
   // Save Profile Photo
