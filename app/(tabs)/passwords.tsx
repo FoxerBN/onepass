@@ -6,22 +6,12 @@ import { router, useFocusEffect } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-
-// Reuse the same ICON_OPTIONS array to retrieve the correct icon:
-const ICON_OPTIONS = [
-  { id: "instagram", source: require("../../assets/icons/instagram.png") },
-  { id: "facebook", source: require("../../assets/icons/facebook.png") },
-  { id: "twitter", source: require("../../assets/icons/twitter.png") },
-  // etc.
-];
+import { ICON_OPTIONS } from "../../constants/IconsOptions";
 
 export default function TabTwoScreen() {
   const insets = useSafeAreaInsets();
   const [passwords, setPasswords] = useState<any[]>([]);
-  // Which passwords are "visible"? Use an object or array to track toggles
-  const [visibleMap, setVisibleMap] = useState<{ [index: number]: boolean }>({});
 
-  // Load passwords whenever screen is focused
   useFocusEffect(
     useCallback(() => {
       loadPasswords();
@@ -44,12 +34,9 @@ export default function TabTwoScreen() {
     }
   }
 
-  // Toggle password visibility for a specific item
-  function toggleVisibility(index: number) {
-    setVisibleMap((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+  // Open showPass modal for a password item by passing the password as a query parameter
+  function handleShowPasswordModal(item: any) {
+    router.push(`/(modal)/showPass?password=${encodeURIComponent(item.password)}`);
   }
 
   // Open the confirm-delete modal
@@ -57,33 +44,23 @@ export default function TabTwoScreen() {
     router.push(`/(modal)/confirmDeletePass?index=${index}`);
   }
 
-  // Render each password entry
   function renderPasswordItem({ item, index }: { item: any; index: number }) {
-    // Find the correct icon source
     const iconObj = ICON_OPTIONS.find((icon) => icon.id === item.iconId);
-
-    // Is password visible or hidden?
-    const isVisible = !!visibleMap[index];
-    // If visible, show the actual password; otherwise show asterisks
-    const displayPassword = isVisible ? item.password : "••••••";
 
     return (
       <View style={styles.passwordItem}>
         {iconObj ? (
           <Image source={iconObj.source} style={styles.icon} />
         ) : (
-          // fallback if no icon
           <View style={[styles.icon, { backgroundColor: "#999" }]} />
         )}
         <View style={styles.passwordDetails}>
           <Text style={styles.nickname}>{item.nickname}</Text>
-          <Text style={styles.passText}>{displayPassword}</Text>
+          <Text style={styles.passText}>{"•".repeat(item.password.length)}</Text>
         </View>
-        {/* Eye icon to toggle visibility */}
-        <TouchableOpacity onPress={() => toggleVisibility(index)} style={styles.eyeButton}>
-          <Text style={styles.eyeText}>{isVisible ? "Hide" : "Show"}</Text>
+        <TouchableOpacity onPress={() => handleShowPasswordModal(item)} style={styles.eyeButton}>
+          <Text style={styles.eyeText}>Show</Text>
         </TouchableOpacity>
-        {/* Trash icon to confirm delete */}
         <TouchableOpacity onPress={() => handleDelete(index)} style={styles.trashButton}>
           <Text style={styles.trashText}>🗑</Text>
         </TouchableOpacity>
@@ -93,21 +70,15 @@ export default function TabTwoScreen() {
 
   return (
     <ProtectedRoute>
-      <View
-        style={[
-          styles.container,
-          { paddingTop: insets.top > 0 ? insets.top : 20 },
-        ]}
-      >
+      <View style={[styles.container, { paddingTop: insets.top > 0 ? insets.top : 20 }]}>
         <Text style={styles.title}>Your Passwords</Text>
-
         {passwords.length === 0 ? (
           <Text style={styles.noPasswords}>No passwords saved yet.</Text>
         ) : (
           <FlatList
             data={passwords}
             keyExtractor={(_, idx) => idx.toString()}
-            contentContainerStyle={{ paddingBottom: 80 }}
+            contentContainerStyle={styles.listContent}
             renderItem={renderPasswordItem}
           />
         )}
@@ -142,17 +113,20 @@ const styles = StyleSheet.create({
     marginTop: 30,
     fontFamily: "SpaceMono",
   },
+  listContent: {
+    paddingBottom: 80,
+  },
   passwordItem: {
     flexDirection: "row",
-    backgroundColor: Colors.card,
+    backgroundColor: "grey",
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
     alignItems: "center",
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 25,
+    height: 25,
     borderRadius: 8,
     marginRight: 12,
     resizeMode: "contain",
@@ -176,7 +150,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   eyeText: {
-    color: Colors.primary,
+    color: "black",
     fontSize: 14,
     fontWeight: "600",
   },

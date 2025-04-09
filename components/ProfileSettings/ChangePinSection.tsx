@@ -60,7 +60,7 @@ export default function ChangePinSection({
 
 const styles = StyleSheet.create({
   sectionContainer: {
-    borderColor: "lightgreen",
+    borderColor: "lightblue",
     borderWidth: 1,
     borderRadius: 8,
     padding: 15,

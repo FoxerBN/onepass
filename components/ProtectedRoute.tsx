@@ -12,7 +12,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const checkAuth = async () => {
       const token = await SecureStore.getItemAsync("authToken");
       const expiry = await SecureStore.getItemAsync("tokenExpiry");
-
+      console.log(token, expiry);
+      
       if (!token || !expiry) {
         await SecureStore.deleteItemAsync("authToken");
         await SecureStore.deleteItemAsync("tokenExpiry");

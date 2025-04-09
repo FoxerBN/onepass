@@ -8,25 +8,16 @@ import {
   StyleSheet,
   Alert,
   Image,
-  FlatList
+  FlatList,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
-
-// 1) A list of icons in your assets folder
-//    We'll store an "id" plus the actual import
-const ICON_OPTIONS = [
-  { id: "instagram", source: require("../../assets/icons/instagram.png") },
-  { id: "facebook", source: require("../../assets/icons/facebook.png") },
-  { id: "twitter", source: require("../../assets/icons/twitter.png") },
-  // Add more icons as needed
-];
+import { ICON_OPTIONS } from "../../constants/IconsOptions";
 
 export default function AddPasswordScreen() {
   const router = useRouter();
 
-  // 2) Local state
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
@@ -62,7 +53,7 @@ export default function AddPasswordScreen() {
 
       // Build new password entry
       const newPasswordEntry = {
-        iconId: selectedIcon,  // store just the ID
+        iconId: selectedIcon, // store just the ID
         nickname: nickname,
         password: password,
       };
@@ -80,7 +71,7 @@ export default function AddPasswordScreen() {
   }
 
   // Renders each icon in a FlatList
-  function renderIconItem({ item }: { item: typeof ICON_OPTIONS[0] }) {
+  function renderIconItem({ item }: { item: (typeof ICON_OPTIONS)[0] }) {
     const isSelected = item.id === selectedIcon;
     return (
       <TouchableOpacity
@@ -108,25 +99,25 @@ export default function AddPasswordScreen() {
 
       {/* Nickname/login input */}
       <Text style={styles.label}>Nickname / Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e.g., Google account"
-        placeholderTextColor={Colors.icon}
-        value={nickname}
-        onChangeText={setNickname}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="e.g., Google email"
+          placeholderTextColor={Colors.icon}
+          value={nickname}
+          onChangeText={setNickname}
+        />
 
-      {/* Password input */}
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="••••••"
-        placeholderTextColor={Colors.icon}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        {/* Password input */}
+        <Text style={styles.label}>Password</Text>
 
+        <TextInput
+          style={styles.input}
+          placeholder="••••••••••••"
+          placeholderTextColor={Colors.icon}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
       {/* Save button */}
       <TouchableOpacity style={styles.saveButton} onPress={handleSavePassword}>
         <Text style={styles.saveButtonText}>Save Password</Text>
@@ -143,15 +134,12 @@ export default function AddPasswordScreen() {
   );
 }
 
-// ----------------------
-// Styles
-// ----------------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
     padding: 20,
-    justifyContent: "flex-start",
+    justifyContent: "center",
   },
   title: {
     fontSize: 22,
@@ -169,11 +157,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   iconList: {
-    paddingBottom: 10,
+    maxHeight: 30,
+    paddingBottom: 1,
   },
   iconContainer: {
-    width: 60,
-    height: 60,
+    width: 40,
+    height: 40,
     marginRight: 10,
     borderRadius: 8,
     borderWidth: 2,
@@ -181,14 +170,14 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.card,
+    backgroundColor: "grey",
   },
   iconSelected: {
     borderColor: Colors.primary,
   },
   iconImage: {
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
     resizeMode: "contain",
   },
   input: {

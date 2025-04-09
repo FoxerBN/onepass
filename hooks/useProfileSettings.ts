@@ -4,7 +4,7 @@ import * as SecureStore from "expo-secure-store";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { router } from "expo-router";
-import Toast from "react-native-toast-message"; // 🧨 toast import
+import Toast from "react-native-toast-message";
 
 // Types for user data
 type UserData = {
