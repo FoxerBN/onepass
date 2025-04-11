@@ -5,6 +5,7 @@ import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { generateTokenWithExpiry } from '../hooks/useGenerateToken'
+import Toast from "react-native-toast-message";
 export function useLogin() {
   const router = useRouter();
   const [showPinInput, setShowPinInput] = useState(false);
@@ -19,7 +20,7 @@ export function useLogin() {
       }
 
       const canUseBiometrics =
-        await SecureStore.canUseBiometricAuthentication();
+        SecureStore.canUseBiometricAuthentication();
       if (canUseBiometrics) {
         const result = await LocalAuthentication.authenticateAsync({
           promptMessage: "Authenticate with Fingerprint",
@@ -42,14 +43,26 @@ export function useLogin() {
   const loginWithPin = async (pin: string) => {
     const storedData = await AsyncStorage.getItem("userData");
     if (!storedData) {
-      Alert.alert("No user found", "Please register an account first.");
+      Toast.show({
+            type: 'error',
+            text1: "No user found",
+            text2: "Please register an account first.",
+            position: "top",
+            visibilityTime: 3000,
+          });
       router.replace("/(auth)/register");
       return;
     }
 
     const storedPin = await SecureStore.getItemAsync("pin");
     if (!storedPin) {
-      Alert.alert("Error", "PIN not found. Please register again.");
+      Toast.show({
+        type: 'error',
+        text1: "PIN not found",
+        text2: "Please register again.",
+        position: "top",
+        visibilityTime: 3000,
+      });
       router.replace("/(auth)/register");
       return;
     }
@@ -58,7 +71,13 @@ export function useLogin() {
       await generateTokenWithExpiry();
       router.replace("/(tabs)");
     } else {
-      Alert.alert("Login Failed", "Incorrect PIN.");
+      Toast.show({
+        type: 'error',
+        text1: "Login Failed",
+        text2: "ncorrect PIN.",
+        position: "top",
+        visibilityTime: 3000,
+      });
     }
   };
 

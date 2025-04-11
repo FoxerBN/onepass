@@ -18,7 +18,9 @@ import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
-
+import { useValidateStep } from "@/hooks/useValidateStep";
+import { useNextBack } from "@/hooks/useNextBack";
+import { useImagePicker } from "../../hooks/useImagePicker";
 export default function RegisterScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -31,82 +33,35 @@ export default function RegisterScreen() {
   const [decryptionPin, setDecryptionPin] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
 
-  const validateStep = () => {
-    if (currentStep === 1) {
-      if (!firstName.trim() || !lastName.trim()) {
-        Alert.alert("Error", "Please enter both first and last names.");
-        return false;
-      }
-    } else if (currentStep === 2) {
-      if (!appNick.trim()) {
-        Alert.alert("Error", "Please enter an app nickname.");
-        return false;
-      }
-    } else if (currentStep === 3) {
-      if (pin.length < 4) {
-        Alert.alert("Error", "Please enter a PIN with at least 4 digits.");
-        return false;
-      }
-    }
-    return true;
-  };
+  const { validateStep } = useValidateStep({
+    currentStep,
+    firstName,
+    lastName,
+    appNick,
+    pin,
+  });
 
-  const handleNext = async () => {
-    if (validateStep()) {
-      if (currentStep < 3) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        const userData = {
-          firstName,
-          lastName,
-          appNick,
-          pinHint,
-          photo,
-          passwords: [],
-        };
-        await AsyncStorage.setItem("userData", JSON.stringify(userData));
-        await SecureStore.setItemAsync("pin", pin);
-        await SecureStore.setItemAsync("decryptionPin", decryptionPin);
-        router.replace("/(tabs)");
-      }
-    }
-  };
+  const { handleNext, handleBack, isFirstStep, isFinalStep } = useNextBack({
+    currentStep,
+    setCurrentStep,
+    validateStep,
+    onFinalStep: async () => {
+      const userData = {
+        firstName,
+        lastName,
+        appNick,
+        pinHint,
+        photo,
+        passwords: [],
+      };
+      await AsyncStorage.setItem("userData", JSON.stringify(userData));
+      await SecureStore.setItemAsync("pin", pin);
+      await SecureStore.setItemAsync("decryptionPin", decryptionPin);
+      router.replace("/(tabs)");
+    },
+  });
 
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handlePickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission needed",
-        "Permission to access media library is required!"
-      );
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: "images",
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-    if (!result.canceled) {
-      const newPath = FileSystem.documentDirectory + "profilePhoto.jpg";
-      try {
-        await FileSystem.copyAsync({
-          from: result.assets[0].uri,
-          to: newPath,
-        });
-        setPhoto(newPath);
-      } catch (error) {
-        console.error("Error saving photo", error);
-        Alert.alert("Error", "Failed to save photo.");
-      }
-    }
-  };
+  const { handlePickImage } = useImagePicker((uri) => setPhoto(uri));
 
   return (
     <ImageBackground
@@ -211,14 +166,14 @@ export default function RegisterScreen() {
           )}
 
           <View style={styles.buttonRow}>
-            {currentStep > 1 && (
+            {!isFirstStep && (
               <TouchableOpacity style={styles.button} onPress={handleBack}>
                 <Text style={styles.buttonText}>Back</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity style={styles.button} onPress={handleNext}>
               <Text style={styles.buttonText}>
-                {currentStep < 3 ? "Next" : "Register"}
+                {isFinalStep ? "Register" : "Next"}
               </Text>
             </TouchableOpacity>
           </View>
