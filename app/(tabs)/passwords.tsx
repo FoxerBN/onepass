@@ -34,7 +34,6 @@ export default function TabTwoScreen() {
     }
   }
 
-  // Open showPass modal for a password item by passing the password as a query parameter
   function handleShowPasswordModal(item: any) {
     router.push(`/(modal)/showPass?password=${encodeURIComponent(item.password)}`);
   }
@@ -118,7 +117,7 @@ const styles = StyleSheet.create({
   },
   passwordItem: {
     flexDirection: "row",
-    backgroundColor: "grey",
+    backgroundColor: "rgba(92, 163, 243, 0.33)",
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
@@ -150,15 +149,15 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   eyeText: {
-    color: "black",
-    fontSize: 14,
+    color: "whitesmoke",
+    fontSize: 16,
     fontWeight: "600",
   },
   trashButton: {
     marginLeft: 2,
   },
   trashText: {
-    fontSize: 16,
+    fontSize: 26,
     color: "red",
   },
   addButton: {

@@ -3,13 +3,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { getNumbOfPass } from "@/hooks/useNumbOfPass";
 export function ProfileHeader() {
   const [userData, setUserData] = useState<{
     firstName: string;
     lastName: string;
     appNick: string;
+    pinHint: string;
     photo?: string;
+    passwords?: string[];
   } | null>(null);
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export function ProfileHeader() {
     loadData();
   }, []);
 
-  const { firstName, lastName, appNick } = userData || {};
+  const { firstName, lastName, appNick,passwords } = userData || {};
 
   return (
     <View style={styles.container}>
@@ -39,6 +41,8 @@ export function ProfileHeader() {
             {firstName} {lastName}
           </Text>
           <Text style={styles.appNick}>@{appNick}</Text>
+          <Text style={styles.passwords}>You have already {userData.passwords?.length} passwords</Text>
+          <Text style={styles.hint}>Your pin hint is: {userData.pinHint}</Text>
         </View>
       )}
     </View>
@@ -87,4 +91,14 @@ const styles = StyleSheet.create({
     color: Colors.icon,
     fontFamily: "SpaceMono",
   },
+  passwords:{
+    fontSize: 16,
+    color: "#e6ffe6",
+    fontFamily: "SpaceMono",
+  },
+  hint:{
+    fontSize: 16,
+    color: "#e6ffe6",
+    fontFamily: "SpaceMono",
+  }
 });

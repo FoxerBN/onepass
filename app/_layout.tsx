@@ -10,6 +10,7 @@ import "react-native-reanimated";
 import * as NavigationBar from "expo-navigation-bar";
 import { Platform } from "react-native";
 import Toast from "react-native-toast-message";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -36,6 +37,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={DarkTheme}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
       <Stack
         screenOptions={{
           headerShown: false,
@@ -56,6 +58,7 @@ export default function RootLayout() {
       </Stack>
       <Toast />
       <StatusBar style="light" hidden={true} />
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }

@@ -17,7 +17,6 @@ export default function ProfileScreen() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const router = useRouter();
   const insets = useSafeAreaInsets();
-
   const menuItems = [
     {
       icon: "settings-outline",
