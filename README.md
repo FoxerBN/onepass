@@ -1,7 +1,7 @@
 # Onepas - Secure Password Manager
 ## 📱 Download
 
-👉 [Stiahnuť aplikáciu pre Android (.apk)](https://github.com/FoxerBN/onepass/releases/download/v1.0.0/onepass.apk)
+👉 [Stiahnuť aplikáciu pre Android (.apk)](https://github.com/FoxerBN/onepass/releases/download/1.0.0/onepass.apk)
 
 Onepas is a mobile application built with **React Native** and **Expo**, designed to help users securely store and manage their account passwords in one place.
 
